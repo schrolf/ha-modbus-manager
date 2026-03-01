@@ -128,7 +128,7 @@ dynamic_config:
 
   meter_type:
     description: "Meter type connected to the inverter"
-    options: ["None", "DTSU666", "DTSU666-20"]
+    options: ["None", "Internal", "DTSU666", "DTSU666-20"]
     default: "DTSU666"
     # None: No smart meter connected - meter registers filtered out
     # DTSU666: Standard single-channel meter (registers 5600-5606, scale: 1)
@@ -1952,7 +1952,7 @@ sensors:
     state_class: measurement
     scale: 0.1
     scan_interval: 10
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: Battery current
     unique_id: battery_current
@@ -1965,7 +1965,7 @@ sensors:
     device_class: "current"
     scale: 0.1
     scan_interval: 10
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: Battery power
     unique_id: battery_power
@@ -1980,7 +1980,7 @@ sensors:
     scale: 1
     scan_interval: 10
     mm_group: "PV_battery_power"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: Battery level
     unique_id: battery_level
@@ -1993,7 +1993,7 @@ sensors:
     state_class: measurement
     scale: 0.1
     scan_interval: 60
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: Battery state of health
     unique_id: battery_state_of_health
@@ -2005,7 +2005,7 @@ sensors:
     state_class: measurement
     scale: 0.1
     scan_interval: 600
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: Battery temperature
     unique_id: battery_temperature
@@ -2019,7 +2019,7 @@ sensors:
     scale: 0.1
     scan_interval: 60
     mm_group: "PV_battery_temperature"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: Daily battery discharge
     unique_id: daily_battery_discharge
@@ -2032,7 +2032,7 @@ sensors:
     state_class: total_increasing
     scale: 0.1
     scan_interval: 600
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: Total battery discharge
     unique_id: total_battery_discharge
@@ -2046,7 +2046,7 @@ sensors:
     state_class: total
     scale: 0.1
     scan_interval: 600
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: Self-consumption of today
     unique_id: self_consumption_of_today
@@ -2167,7 +2167,7 @@ sensors:
     state_class: total_increasing
     scale: 0.1
     scan_interval: 600
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: Total battery charge
     unique_id: total_battery_charge
@@ -2181,7 +2181,7 @@ sensors:
     state_class: total
     scale: 0.1
     scan_interval: 600
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: Daily exported energy
     unique_id: daily_exported_energy
@@ -2420,7 +2420,7 @@ sensors:
     data_type: uint32
     swap: word
     entity_category: diagnostic
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     flags:
       3: "Battery Average Under-voltage Fault"
       7: "Battery Over-temperature Fault"
@@ -2439,7 +2439,7 @@ sensors:
     data_type: uint32
     swap: word
     entity_category: diagnostic
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     flags:
       0: "BDC T Sensor Open Circuit Alarm"
       1: "BDC T Sensor Short Circuit Alarm"
@@ -2451,7 +2451,7 @@ sensors:
     data_type: uint32
     swap: word
     entity_category: diagnostic
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     flags:
       0: "Overvoltage Alarm"
       1: "Over-temperature Alarm"
@@ -2472,7 +2472,7 @@ sensors:
     data_type: uint32
     swap: word
     entity_category: diagnostic
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     flags:
       0: "Overvoltage Protection"
       1: "Over-temperature Protection"
@@ -2497,7 +2497,7 @@ sensors:
     data_type: uint32
     swap: word
     entity_category: diagnostic
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     flags:
       0: "FET Failure/Battery Switch Failure"
       1: "Failure in Battery Internal Hardware"
@@ -2620,6 +2620,7 @@ sensors:
       3: "External EMS mode"
       4: "VPP"
     mm_group: "PV_modes"
+    condition: "meter_type != 'Internal'"
 
   # Battery control sensors
   - name: Battery forced charge discharge cmd raw
@@ -2636,7 +2637,7 @@ sensors:
       0xBB: "Discharge"
       0xCC: "Stop"
     mm_group: "PV_battery_control"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: Battery forced charge discharge power raw
     unique_id: battery_forced_charge_discharge_power_raw
@@ -2648,7 +2649,7 @@ sensors:
     device_class: "power"
     state_class: measurement
     scan_interval: 10
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: Global mpp scan manual raw
     unique_id: global_mpp_scan_manual_raw
@@ -2671,7 +2672,7 @@ sensors:
     options:
       0x55: "Disabled"
       0xAA: "Enabled"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
  ################################################################
  # Wallbox Registers (read-only, only when wallbox is connected)
@@ -2806,7 +2807,7 @@ controls:
       0xBB: "Discharge"
       0xCC: "Stop"
     mm_group: "PV_battery_control"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: Battery forced charge discharge power
     unique_id: battery_forced_charge_discharge_power
@@ -2823,7 +2824,7 @@ controls:
     step: 100
     scan_interval: 10
     mm_group: "PV_battery_control"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     # Placeholder will be replaced with maximum of model-specific max_charge_power and max_discharge_power
     # For SH10RT: max(10600, 10600) = 10600 W
 
@@ -2856,7 +2857,7 @@ controls:
     step: 1
     scan_interval: 30
     mm_group: "PV_battery_control"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - type: "number"
     name: "Min SoC"
@@ -2872,7 +2873,7 @@ controls:
     step: 1
     scan_interval: 30
     mm_group: "PV_battery_control"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - type: "select"
     name: "Backup Mode"
@@ -2885,7 +2886,7 @@ controls:
       0x55: "Disabled"
       0xAA: "Enabled"
     mm_group: "PV_modes"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - type: "number"
     name: "Export Power Limit"
@@ -2970,7 +2971,7 @@ controls:
     step: 1
     scan_interval: 30
     mm_group: "PV_battery_control"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - type: "select"
     name: "Load Adjustment Mode ON/OFF"
@@ -2999,7 +3000,7 @@ controls:
     step: 0.01
     scan_interval: 10
     mm_group: "PV_battery_control"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     # Placeholder will be replaced with model-specific value from dynamic_config.valid_models
     # For SH10RT: 10600 W -> 10.6 kW
 
@@ -3017,7 +3018,7 @@ controls:
     step: 0.01
     scan_interval: 10
     mm_group: "PV_battery_control"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     # Placeholder will be replaced with model-specific value from dynamic_config.valid_models
     # For SH10RT: 10600 W -> 10.6 kW
 
@@ -3055,7 +3056,7 @@ controls:
     scale: 10
     scan_interval: 10
     mm_group: "PV_battery_control"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     # Placeholder will be replaced with 50% of model-specific max_charge_power
     # For SH10RT: 10600 * 0.5 = 5300 W
 
@@ -3075,7 +3076,7 @@ controls:
     scale: 10
     scan_interval: 10
     mm_group: "PV_battery_control"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     # Placeholder will be replaced with 50% of model-specific max_discharge_power
     # For SH10RT: 10600 * 0.5 = 5300 W
 
@@ -3090,7 +3091,7 @@ controls:
       0x55: "Disabled"
       0xAA: "Enabled"
     mm_group: "PV_control"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - type: "select"
     name: "PV Power Limitation"
@@ -3184,7 +3185,7 @@ calculated:
     state_class: "measurement"
     precision: 0
     mm_group: "PV_grid_power"
-    condition: "meter_type == 'DTSU666' or meter_type == 'DTSU666-20'"
+    condition: "meter_type == 'Internal' or meter_type == 'DTSU666' or meter_type == 'DTSU666-20'"
 
   - name: "Import Power"
     unique_id: "import_power"
@@ -3275,7 +3276,7 @@ calculated:
     state_class: "measurement"
     precision: 1
     mm_group: "PV_efficiency"
-    condition: "meter_type == 'DTSU666' or meter_type == 'DTSU666-20'"
+    condition: "meter_type == 'Internal' or meter_type == 'DTSU666' or meter_type == 'DTSU666-20'"
 
   - name: "Battery to Load Efficiency"
     unique_id: "battery_to_load_efficiency"
@@ -3306,7 +3307,7 @@ calculated:
     state_class: "measurement"
     precision: 1
     mm_group: "PV_efficiency"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   # Power Balance Calculations
   - name: "Power Balance"
@@ -3327,7 +3328,7 @@ calculated:
     state_class: "measurement"
     precision: 0
     mm_group: "PV_power_balance"
-    condition: "meter_type == 'DTSU666' or meter_type == 'DTSU666-20'"
+    condition: "meter_type == 'Internal' or meter_type == 'DTSU666' or meter_type == 'DTSU666-20'"
 
   # Phase Power Calculations
   - name: "Total Meter Phase Power"
@@ -3345,7 +3346,7 @@ calculated:
     state_class: "measurement"
     precision: 0
     mm_group: "PV_phase_power"
-    condition: "meter_type == 'DTSU666' or meter_type == 'DTSU666-20'"
+    condition: "meter_type == 'Internal' or meter_type == 'DTSU666' or meter_type == 'DTSU666-20'"
 
   # Individual Phase Power Calculations
   - name: "Phase A Power"
@@ -3659,7 +3660,7 @@ calculated:
     state_class: "measurement"
     precision: 1
     mm_group: "battery_level_nominal"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: "Battery charge (nominal)"
     unique_id: "battery_charge_nom"
@@ -3681,7 +3682,7 @@ calculated:
     state_class: "measurement"
     precision: 1
     mm_group: "battery_charge_nominal"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: "Battery charge"
     unique_id: "battery_charge"
@@ -3706,7 +3707,7 @@ calculated:
       }}
     mm_group: "battery_charge"
     icon: "mdi:battery-charging-30"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: "Battery charge (health-rated)"
     unique_id: "battery_charge_health_rated"
@@ -3729,7 +3730,7 @@ calculated:
     state_class: "measurement"
     precision: 2
     mm_group: "battery_charge_health_rated"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   # Energy Consumption Calculations
   - name: "Daily consumed energy"
@@ -3829,7 +3830,7 @@ calculated:
     state_class: "measurement"
     precision: 0
     mm_group: "battery_power_charging"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   - name: "Battery discharging power"
     unique_id: "battery_discharging_power"
@@ -3850,7 +3851,7 @@ calculated:
     state_class: "measurement"
     precision: 0
     mm_group: "battery_power_discharging"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
 
   # HA Energy Dashboard compatible sensors
   # These sensors follow HA Energy Dashboard convention:
@@ -3872,7 +3873,7 @@ calculated:
     state_class: "measurement"
     precision: 0
     mm_group: "battery_power_energy_dashboard"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     # Note: battery_power is negative when charging, so we multiply by -1 to get positive when charging
     # This is useful for display purposes (showing positive charging power)
 
@@ -3886,7 +3887,7 @@ calculated:
     state_class: "measurement"
     precision: 0
     mm_group: "battery_power_energy_dashboard"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     # Note: battery_power is positive when discharging, which matches HA Energy Dashboard convention
     # Use this sensor for the HA energy dashboard.
     # HA Energy Dashboard configuration description:
@@ -4971,7 +4972,7 @@ calculated:
 
   - name: "Battery Status Indicator"
     unique_id: "battery_status_indicator"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     type: "sensor"
     state: >-
       {% set soc = states('[[mm:sensor:{PREFIX}_battery_level]]') | float(0) %}
@@ -5028,7 +5029,7 @@ calculated:
 
   - name: "Battery Health Status"
     unique_id: "battery_health_status"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     type: "sensor"
     availability: >-
       {{
@@ -5103,7 +5104,7 @@ binary_sensors:
 
   - name: "Battery charging"
     unique_id: "battery_charging"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     type: "binary_sensor"
     availability: >-
       {{
@@ -5133,7 +5134,7 @@ binary_sensors:
 
   - name: "Battery charging (delay)"
     unique_id: "battery_charging_delay"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     type: "binary_sensor"
     availability: "{{ not is_state('[[mm:binary_sensor:{PREFIX}_battery_charging]]', 'unavailable') }}"
     delay_on:
@@ -5144,7 +5145,7 @@ binary_sensors:
 
   - name: "Battery discharging"
     unique_id: "battery_discharging"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     type: "binary_sensor"
     availability: >-
       {{
@@ -5173,7 +5174,7 @@ binary_sensors:
 
   - name: "Battery discharging (delay)"
     unique_id: "battery_discharging_delay"
-    condition: "battery_enabled == true"
+    condition: "battery_enabled == true or meter_type == 'Internal'"
     type: "binary_sensor"
     availability: "{{ not is_state('[[mm:binary_sensor:{PREFIX}_battery_discharging]]', 'unavailable') }}"
     delay_on:

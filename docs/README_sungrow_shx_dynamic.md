@@ -61,6 +61,8 @@ The template supports **all 36** following Sungrow SHx models:
 - **Battery sbr_battery:** Inverter battery registers + SBR battery template entities
 
 #### **Meter Type Filtering**
+- **None:** No meter registers (5740-5745)
+- **Internal:** Inverter is installed as full backup and no dedicated meter is installed
 - **DTSU666:** Standard single-channel meter (registers 5600-5606)
 - **DTSU666-20:** Dual-channel meter with Channel 2 support (registers 5600-5606 + 13199-13205)
 - **Note:** iHomeManager is now a separate template (`sungrow_ihomemanager.yaml`) and should not be selected here
