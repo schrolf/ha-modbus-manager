@@ -16,6 +16,7 @@ from homeassistant.components.modbus.const import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import (
@@ -915,10 +916,22 @@ class ModbusCoordinator(DataUpdateCoordinator):
                     "binary_sensors": len(binary_sensors),
                 }
 
+                # filter disabled entities
+                registers = self._filter_disabled_entities(registers)
+                #controls = list(filter(lambda c: not c.disabled, controls))
+                #calculated = list(filter(lambda c: not c.disabled, calculated))
+                #binary_sensors = list(filter(lambda b: not b.disabled, binary_sensors))
+                enabled_counts = {
+                    "sensors": registers,
+                    "controls": controls,
+                    "calculated": calculated,
+                    "binary_sensors": binary_sensors
+                }
+
                 _LOGGER.debug(
                     (
                         "Dynamic filtering summary for %s/%s (prefix=%s, slave=%s): "
-                        "template=%s -> firmware=%s -> model=%s -> conditions=%s "
+                        "template=%s -> firmware=%s -> model=%s -> conditions=%s -> enabled=%s"
                         "(connection_type=%s, meter_type=%s, battery_config=%s)"
                     ),
                     template_name,
@@ -929,6 +942,7 @@ class ModbusCoordinator(DataUpdateCoordinator):
                     firmware_counts,
                     model_counts,
                     condition_counts,
+                    enabled_counts,
                     dynamic_config.get("connection_type"),
                     dynamic_config.get("meter_type"),
                     dynamic_config.get("battery_config"),
@@ -1784,6 +1798,42 @@ class ModbusCoordinator(DataUpdateCoordinator):
         except Exception as e:
             _LOGGER.error("Error filtering by conditions: %s", str(e))
             return entities  # Return unfiltered on error
+
+    def _filter_disabled_entities(
+        self, entities: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        """
+        Remove disabled entities from the list.
+
+        Args:
+            entities: List of entities to filter
+
+        Returns:
+            Filtered list of entities
+        """
+        try:
+            filtered_entities = []
+            entity_reg = er.async_get(self.hass)
+
+            for entity in entities:
+                unique_id = entity.get("unique_id", "") or ""
+                entity_id = entity_reg.async_get_entity_id(
+                    domain="sensor",  # Or iterate domains if it includes binary_sensors/switches
+                    platform="modbus_manager",
+                    unique_id=f"{self.config_entry.entry_id}_{unique_id}"
+                )
+                entry = entity_reg.async_get_entity_id("sensor.sh20t_" + unique_id)
+                _LOGGER.debug("Found entity: %s", entry)
+                if entry and entry.disabled_by is not None:
+                    # Skip this register completely; it won't be batched or polled
+                    continue
+                filtered_entities.append(entity)
+            return filtered_entities
+
+        except Exception as e:
+            _LOGGER.error("Error filtering disabled entities: %s", str(e))
+            return entities  # Return unfiltered on error
+
 
     def _evaluate_single_condition(self, condition: str, dynamic_config: dict) -> bool:
         """Evaluate a single condition (no AND/OR).
